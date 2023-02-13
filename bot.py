@@ -3,6 +3,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import re
 import webbrowser
+import requests
 
 
 #   Set up Mastodon
@@ -46,6 +47,7 @@ class Scraper:
 
 
 simps = 'https://www.reddit.com/r/simpsonsshitposting/'
+
 scrapedTag = Scraper(simps).scrape()
 
 myRegex = re.search("src=[\"\']([a-zA-Z0-9_\.\/\-:]+)[\"\']", str(scrapedTag))
@@ -54,6 +56,12 @@ imageLink = myRegex.group()
 imageLink = imageLink[5:-1]
 print(imageLink)
 
-webbrowser.open(imageLink)
-
+#webbrowser.open(imageLink)
 #mastodon.status_post("hello world!")
+
+img_data = requests.get(imageLink).content
+with open('image_name.jpg', 'wb') as handler:
+    handler.write(img_data)
+
+media = mastodon.media_post("image_name.jpg", description="Test upload")
+mastodon.status_post("Test upload", media_ids=media)
